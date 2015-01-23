@@ -1,12 +1,12 @@
 all:
 	mkdir -p bin
 	haxe -cp src \
-	-swf-header 400:300:60:ffffff \
+	-swf-header 600:500:60:aeaeae \
 	-swf-version 11.3 \
 	-swf bin/Sandbox.swf \
-	-swf-lib starling.swf \
+	-swf-lib starling.swc \
 	--macro "patchTypes('starling.patch')" \
-	-main Sandbox
+	-main com.cykon.haxe.Sandbox
 
 clean:
 	rm -r bin
