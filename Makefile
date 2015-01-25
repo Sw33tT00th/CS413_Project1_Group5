@@ -8,6 +8,10 @@ all:
 	--macro "patchTypes('starling.patch')" \
 	-main com.cykon.haxe.Sandbox
 
+run:
+	make
+	cygstart bin/Sandbox.swf
+
 clean:
 	rm -r bin
 	mkdir -p bin
