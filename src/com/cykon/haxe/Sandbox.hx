@@ -38,8 +38,6 @@ class Sandbox extends starling.display.Sprite {
     public function new() {
         super();
 		populateAssetManager();
-		globalStage.addEventListener(KeyboardEvent.KEY_DOWN, keyDown);
-		globalStage.addEventListener(KeyboardEvent.KEY_UP, keyUp);
     }
 	
 	/** Function used to load in any assets to be used during the game */
@@ -72,6 +70,8 @@ class Sandbox extends starling.display.Sprite {
 		
 		// Start the onEnterFrame calls
 		this.addEventListener(EnterFrameEvent.ENTER_FRAME, onEnterFrame);	
+		globalStage.addEventListener(KeyboardEvent.KEY_DOWN, keyDown);
+		globalStage.addEventListener(KeyboardEvent.KEY_UP, keyUp);
 	}
 	
 	/** Function called every frame update, main game logic loop */
