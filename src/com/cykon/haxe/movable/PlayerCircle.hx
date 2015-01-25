@@ -41,15 +41,17 @@ class PlayerCircle extends Circle {
 	/** Function to be called when a particular key is pressed down */
 	public function keyDown( keyCode : Int ){
 		keyMap.set(keyCode, true);
+		updateVelocity();
 	}
 	
 	/** Function to be called when a particular key is unpressed */
 	public function keyUp( keyCode : Int ){
 		keyMap.set(keyCode, false);
+		updateVelocity();
 	}
 	
-	/** Overriden version of the default apply velocity, here we can examine the key pressed */
-	public override function applyVelocity(modifier:Float){
+	/** Updates the velocity based on various key presses */
+	public function updateVelocity(){
 		// Reset the velocities
 		vx = vy = 0;
 		
@@ -69,8 +71,5 @@ class PlayerCircle extends Circle {
 			vx = vx / moveSpeed * angleSpeed;
 			vy = vy / moveSpeed * angleSpeed;			
 		}
-		
-		// Call the default applyVelocity method
-		super.applyVelocity(modifier);
 	}
 }
