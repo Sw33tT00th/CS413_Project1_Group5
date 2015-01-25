@@ -32,6 +32,9 @@ class Sandbox extends starling.display.Sprite {
 	// Reference to the player circle, which the user will control
 	var player : PlayerCircle;
 	
+	// Reference to the main circle array
+	var a_Circle : Array<Circle> = new Array<Circle>();
+	
     public function new() {
         super();
 		populateAssetManager();
@@ -42,6 +45,7 @@ class Sandbox extends starling.display.Sprite {
 	/** Function used to load in any assets to be used during the game */
 	private function populateAssetManager() {
 		assets.enqueue("../assets/circle.png");
+		assets.enqueue("../assets/circle_green_glow.png");
 		assets.loadQueue(function(percent){
 			// Ideally we would have some feedback here (loading screen)
 			
@@ -60,6 +64,12 @@ class Sandbox extends starling.display.Sprite {
 		// Add our player to the scene graph
 		this.addChild(player);
 		
+		// Demo circle object
+		var circle : Circle = new Circle(assets.getTexture("circle_green_glow"), -25, -25, 25);
+		circle.setVelocity(10, 10);
+		a_Circle.push(circle);
+		this.addChild(circle);
+		
 		// Start the onEnterFrame calls
 		this.addEventListener(EnterFrameEvent.ENTER_FRAME, onEnterFrame);	
 	}
@@ -71,6 +81,11 @@ class Sandbox extends starling.display.Sprite {
 		
 		// Update the player object's velocities
 		player.applyVelocity( modifier );
+		
+		// Update circle velocities
+		for( i in 0...a_Circle.length ){
+			a_Circle[i].applyVelocity( modifier );
+		}
 	}
 	
 	/** Used to keep track when a key is pressed down */
