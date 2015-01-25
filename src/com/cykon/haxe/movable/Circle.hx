@@ -19,6 +19,9 @@ class Circle extends starling.display.Image {
 	var vx:Float = 0;	// X Velocity
 	var vy:Float = 0;	// Y Velocity
 	
+	var beenHit:Bool = false; // Tells the updateVelocity method whether we can move or not
+	var hitVector:Vector;	  // The normal vector representing a wall which was hit
+	
 	/** Return the X location of this (note: it's the center of the circle) */
 	public function getX() : Float{
 		return x + radius;
@@ -48,18 +51,23 @@ class Circle extends starling.display.Image {
 	
 	/** Applies the velocities of the circle to the x & y coordinates */
 	public function applyVelocity(modifier:Float){
+		if(beenHit){
+			beenHit = false;
+			return;
+		}
+		
 		x += vx*modifier;
 		y += vy*modifier;
 	}
 	
 	/** Test if this circle has collided with another circle */
-	public function circleHit( other : Circle ) : Bool{
+	public function circleHit( other : Circle, modifier : Float = 1.0 ) : Bool{
 		// Translate the movement vector of the two circles as if one wasn't moving
-		var _regVector = new Vector(this.vx-other.vx, this.vy-other.vy);
+		var _regVector = Vector.getVector(other.vx,other.vy,this.vx,this.vy);
 		var regVector = _regVector.clone();
 		
 		// Get the direct vector between the two circles
-		var dirVector = new Vector(other.getX()-this.getX(), other.getY()-this.getY());
+		var dirVector = Vector.getVector(this.getX(),this.getY(),other.getX(),other.getY());
 		
 		// No velocity || not moving towards each other, no need to compute
 		if(regVector.mag == 0 || regVector.dot(dirVector) <= 0)
@@ -88,12 +96,17 @@ class Circle extends starling.display.Image {
 		if(regVector.mag <= _regVector.mag){
 			this.x += regVector.vx;
 			this.y += regVector.vy;
-			this.vx = this.vy = other.vx = other.vy = 0;
+			this.beenHit = other.beenHit = true;
 			return true;
 		}
 
 		return false;
 	}
+	
+	/** Recalculates the velocities so it bounces about the point of impact */
+	public function hitBounce(){
+	}
+	
 	
 	public function new(texture:Texture, x:Float, y:Float, radius:Float){
 		super(texture);

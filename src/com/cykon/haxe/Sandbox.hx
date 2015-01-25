@@ -34,7 +34,7 @@ class Sandbox extends starling.display.Sprite {
 	var player : PlayerCircle;
 	
 	// Reference to the main circle array
-	var a_Circle : Array<Circle> = new Array<Circle>();
+	var a_Circle : Array<DespawningCircle> = new Array<DespawningCircle>();
 	
     public function new() {
         super();
@@ -58,14 +58,14 @@ class Sandbox extends starling.display.Sprite {
 	/** Function to be called when we are ready to start the game */
 	private function startGame() {
 		// Instantiate a new player at the center of the screen with radius 15 and speed 15
-		player = new PlayerCircle(assets.getTexture("circle"), globalStage.stageWidth/2.0, globalStage.stageHeight/2.0, 15, 8);
+		player = new PlayerCircle(assets.getTexture("circle"), globalStage.stageWidth/2.0, globalStage.stageHeight/2.0, 15, 10);
 		
 		// Add our player to the scene graph
 		this.addChild(player);
 		
 		// Demo circle object
-		var circle : Circle = new Circle(assets.getTexture("circle_green_glow"), 400, 100, 25);
-		circle.setVelocity(0, 1);
+		var circle : DespawningCircle = new DespawningCircle(assets.getTexture("circle_green_glow"), 400, 100, 25, globalStage.stageWidth, globalStage.stageHeight);
+		circle.setVelocity(0, 2);
 		a_Circle.push(circle);
 		this.addChild(circle);
 		
@@ -80,13 +80,14 @@ class Sandbox extends starling.display.Sprite {
 		// Calculate how time actually passed
 		var modifier = event.passedTime / perfectDeltaTime;
 		
-		// Update the player object's velocities if it did not hit a_Circle[0]
-		if( !player.circleHit( a_Circle[0] ) )
-			player.applyVelocity( modifier );
+		player.circleHit( a_Circle[0], modifier );
+		player.applyVelocity( modifier );
 			
 		// Update circle velocities
 		for( i in 0...a_Circle.length ){
 			a_Circle[i].applyVelocity( modifier );
+			//if(a_Circle[i].hasDespawned())
+			//	trace("nooo");
 		}
 	}
 	
