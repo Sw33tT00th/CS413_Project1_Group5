@@ -19,6 +19,11 @@ class Vector {
 		this.mag = Math.sqrt(vx*vx + vy*vy);
 	}
 	
+	/** Returns a vector about two points */
+	public static function getVector(x1:Float,y1:Float,x2:Float,y2:Float):Vector{
+		return new Vector(x2-x1,y2-y1);
+	}
+	
 	/** Creates an identical instance of this object */
 	public function clone() : Vector{
 		return new Vector(vx,vy);
