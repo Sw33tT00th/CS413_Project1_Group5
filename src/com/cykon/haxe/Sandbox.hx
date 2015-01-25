@@ -106,6 +106,7 @@ class Sandbox extends starling.display.Sprite {
         try {
 			// Attempt to start the game logic
 			var starling = new starling.core.Starling(Sandbox, flash.Lib.current.stage);
+			starling.antiAliasing = 6;
             globalStage = starling.stage; 
 			starling.start();
         } catch(e:Dynamic){
