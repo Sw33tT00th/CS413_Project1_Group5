@@ -23,9 +23,9 @@ class DespawningCircle extends Circle {
 		this.stageHeight = stageHeight;
 	}
 	
-	public override function applyVelocity(modifier:Float){
+	public override function applyVelocity(modifier:Float):Bool{
 		if(despawnMe)
-			return;
+			return true;
 			
 		super.applyVelocity(modifier);
 		
@@ -33,10 +33,10 @@ class DespawningCircle extends Circle {
 		if(distance > prevDist && isOutOfBounds()){
 			despawnMe = true;
 			this.removeFromParent();
-			//trace("DESPAWNED");
 		}
 			
 		prevDist = distance;
+		return true;
 	}
 	
 	public function hasDespawned():Bool{
