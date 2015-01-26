@@ -1,7 +1,7 @@
 all:
 	mkdir -p bin
 	haxe -cp src \
-	-swf-header 600:500:60:000000 \
+	-swf-header 1280:720:60:000000 \
 	-swf-version 11.3 \
 	-swf bin/Sandbox.swf \
 	-swf-lib starling.swc \
@@ -13,5 +13,5 @@ run:
 	cygstart bin/Sandbox.swf
 
 clean:
-	rm -r bin
+	rm bin/Sandbox.swf
 	mkdir -p bin
