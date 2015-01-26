@@ -133,7 +133,7 @@ class Circle extends starling.display.Image {
 		}
 		
 		// Get the distance which must be subtracted from dotDistance (makes the circles close enough to touch)
-		var subtractDist = Math.sqrt( totRadius*totRadius - shortestDist*shortestDist ) + 1;
+		var subtractDist = Math.sqrt( totRadius*totRadius - shortestDist*shortestDist );// + 1;
 		
 		// Multiply the normalized regVector by dotDist - subtractDist
 		regVector.multiply(dotDist - subtractDist);

@@ -7,7 +7,7 @@
   */
 package com.cykon.haxe;
 
-import com.cykon.haxe.generator.DCircleGenerator;
+import com.cykon.haxe.generator.*;
 import com.cykon.haxe.movable.*;
 import starling.utils.AssetManager;
 import starling.textures.Texture;
@@ -38,6 +38,10 @@ class Sandbox extends starling.display.Sprite {
 	// Generator which will spawn enemys periodically
 	var enemyGenerator : DCircleGenerator;
 	
+	// Generator which will spawn points!
+	var pointGenerator : SCircleGenerator;
+	var points = 0;
+	
 	// Simple constructor
     public function new() {
         super();
@@ -47,6 +51,7 @@ class Sandbox extends starling.display.Sprite {
 	/** Function used to load in any assets to be used during the game */
 	private function populateAssetManager() {
 		assets.enqueue("../assets/circle.png");
+		assets.enqueue("../assets/circle_point.png");
 		assets.enqueue("../assets/circle_green_glow.png");
 		assets.loadQueue(function(percent){
 			// Ideally we would have some feedback here (loading screen)
@@ -61,14 +66,16 @@ class Sandbox extends starling.display.Sprite {
 	/** Function to be called when we are ready to start the game */
 	private function startGame() {
 		// Instantiate a new player at the center of the screen with radius 15 and speed 15
-		player = new PlayerCircle(assets.getTexture("circle"), globalStage.stageWidth/2.0, globalStage.stageHeight/2.0, 15, 4);
+		player = new PlayerCircle(assets.getTexture("circle"), globalStage.stageWidth/2.0, globalStage.stageHeight/2.0, 25, 8);
 		
 		// Add our player to the scene graph
 		this.addChild(player);
 		
 		// Initiate our enemy generator
-		enemyGenerator = new DCircleGenerator(this, assets.getTexture("circle_green_glow"), 1, 5, 10, 20, 200, globalStage.stageWidth, globalStage.stageHeight);
-				
+		enemyGenerator = new DCircleGenerator(this, assets.getTexture("circle_green_glow"), 1, 5, 10, 70, 100, globalStage.stageWidth, globalStage.stageHeight);
+		pointGenerator = new SCircleGenerator(this, assets.getTexture("circle_point"), 20, globalStage.stageWidth, globalStage.stageHeight);
+		pointGenerator.generate();
+		
 		// Start the onEnterFrame calls
 		this.addEventListener(EnterFrameEvent.ENTER_FRAME, onEnterFrame);	
 		globalStage.addEventListener(KeyboardEvent.KEY_DOWN, keyDown);
@@ -84,9 +91,14 @@ class Sandbox extends starling.display.Sprite {
 		// Create a modifier based on time passed / expected time
 		var modifier = event.passedTime / perfectDeltaTime;
 		
+		if(pointGenerator.circleHit( player )){
+			points += 10;
+			pointGenerator.generate();
+		}
+		
 		// Check if the player was hit by anything contained in the generator
 		if(enemyGenerator.circleHit( player )){
-			trace("You lose!", flash.Lib.getTimer());
+			trace("You lose! " + "Score: " + points + " | Time: " + flash.Lib.getTimer());
 			running = false;
 		}
 		
@@ -115,7 +127,7 @@ class Sandbox extends starling.display.Sprite {
         try {
 			// Attempt to start the game logic
 			var starling = new starling.core.Starling(Sandbox, flash.Lib.current.stage);
-			starling.antiAliasing = 6;
+			//starling.antiAliasing = 16;
             globalStage = starling.stage; 
 			starling.start();
         } catch(e:Dynamic){
