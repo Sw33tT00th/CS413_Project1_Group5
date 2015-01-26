@@ -72,4 +72,14 @@ class PlayerCircle extends Circle {
 			vy = vy / moveSpeed * angleSpeed;			
 		}
 	}
+	
+	public override function applyVelocity(modifier:Float):Bool{
+		//updateVelocity();
+		var applied = super.applyVelocity(modifier);
+		if(applied){
+			updateVelocity();
+		}
+		
+		return applied;
+	}
 }

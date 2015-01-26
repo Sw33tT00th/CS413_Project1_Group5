@@ -64,7 +64,7 @@ class Sandbox extends starling.display.Sprite {
 		this.addChild(player);
 		
 		// Demo circle object
-		var circle : DespawningCircle = new DespawningCircle(assets.getTexture("circle_green_glow"), 400, 100, 25, globalStage.stageWidth, globalStage.stageHeight);
+		var circle : DespawningCircle = new DespawningCircle(assets.getTexture("circle_green_glow"), 400, 100, 50, globalStage.stageWidth, globalStage.stageHeight);
 		circle.setVelocity(0, 2);
 		a_Circle.push(circle);
 		this.addChild(circle);
@@ -80,7 +80,11 @@ class Sandbox extends starling.display.Sprite {
 		// Calculate how time actually passed
 		var modifier = event.passedTime / perfectDeltaTime;
 		
-		player.circleHit( a_Circle[0], modifier );
+		if( player.circleHit( a_Circle[0], modifier ) ){
+			a_Circle[0].hitSlide();
+			player.hitSlide();
+		}
+		
 		player.applyVelocity( modifier );
 			
 		// Update circle velocities
