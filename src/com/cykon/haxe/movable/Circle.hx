@@ -23,6 +23,15 @@ class Circle extends starling.display.Image {
 	var hitVector:Vector;	   // The normal vector representing a wall which was hit
 	var leftoverMag:Float = 0; // The leftover magnitude from the last hit;
 	
+	public function hasBeenHit() : Bool {
+		return beenHit;
+	}
+	
+	/** Reterns whether or not there is leftoverMag from a hit */
+	public function hasLeftOverMag() : Bool{
+		return (leftoverMag != 0);
+	}
+	
 	/** Return the X location of this (note: it's the center of the circle) */
 	public function getX() : Float{
 		return x + radius;
@@ -31,6 +40,16 @@ class Circle extends starling.display.Image {
 	/** Return the Y location of this (note: it's the center of the circle) */
 	public function getY() : Float{
 		return y + radius;
+	}
+	
+	/** Return the vx of this */
+	public function getVX() : Float{
+		return vx;
+	}
+	
+	/** Return the vy of this */
+	public function getVY() : Float{
+		return vy;
 	}
 	
 	/** Return the radius of this */
@@ -52,7 +71,7 @@ class Circle extends starling.display.Image {
 	
 	/** Applies the velocities of the circle to the x & y coordinates */
 	public function applyVelocity(modifier:Float):Bool{
-		
+		leftoverMag = 0;
 		if(beenHit){
 			beenHit = false;
 			return false;
@@ -76,6 +95,7 @@ class Circle extends starling.display.Image {
 	
 	/** Test if this circle has collided with another circle */
 	public function circleHit( other : Circle, modifier : Float = 1.0 ) : Bool{
+		leftoverMag = 0;
 		//If leftover Mag is -1, we can set it to use the full magnitude
 		
 		var otherVector = new Vector(other.vx,other.vy);
@@ -113,7 +133,7 @@ class Circle extends starling.display.Image {
 		}
 		
 		// Get the distance which must be subtracted from dotDistance (makes the circles close enough to touch)
-		var subtractDist = Math.sqrt( totRadius*totRadius - shortestDist*shortestDist );
+		var subtractDist = Math.sqrt( totRadius*totRadius - shortestDist*shortestDist ) + 1;
 		
 		// Multiply the normalized regVector by dotDist - subtractDist
 		regVector.multiply(dotDist - subtractDist);
@@ -127,11 +147,11 @@ class Circle extends starling.display.Image {
 			
 			this.hitVector = other.hitVector = Vector.getVector(getX(),getY(),other.getX(),other.getY()).normalize();	
 			
-			this.leftoverMag = thisVector.mag - Vector.getVector(this.x,this.y,this.x-regVector.vx,this.y-regVector.vy).mag;
-			other.leftoverMag = otherVector.mag;
+			//this.leftoverMag = thisVector.mag - Vector.getVector(this.x,this.y,this.x-regVector.vx,this.y-regVector.vy).mag;
+			//other.leftoverMag = otherVector.mag;
 			
-			if(this.leftoverMag < 0)
-				this.leftoverMag = 0;
+			//if(this.leftoverMag < 0)
+			//	this.leftoverMag = 0;
 			
 			return true;
 		}
@@ -141,11 +161,13 @@ class Circle extends starling.display.Image {
 	
 	/** Recalculates the velocities so it bounces about the point of impact */
 	public function hitBounce(){
-		var velVector = new Vector(vx,vy);
-		velVector.subtract(hitVector.multiply(2*velVector.dot(hitVector)));
+		if(beenHit){
+			var velVector = new Vector(vx,vy);
+			velVector = velVector.clone().subtract(hitVector.multiply(2*velVector.dot(hitVector))).normalize().multiply(velVector.mag);
 		
-		vx = velVector.vx;
-		vy = velVector.vy;
+			vx = velVector.vx;
+			vy = velVector.vy;
+		}
 	}
 	
 	/** Recalculates the velocities so it slides about the point of impact */
@@ -164,7 +186,6 @@ class Circle extends starling.display.Image {
 			}
 		}
 	}
-	
 	
 	public function new(texture:Texture, x:Float, y:Float, radius:Float){
 		super(texture);

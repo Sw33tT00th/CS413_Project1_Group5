@@ -23,6 +23,8 @@ class DespawningCircle extends Circle {
 		this.stageHeight = stageHeight;
 	}
 	
+	/** Overriden version of the Circle's apply velocity,
+	  * If the circle isnt heading towards the center && it's off screen, we despawn it */
 	public override function applyVelocity(modifier:Float):Bool{
 		if(despawnMe)
 			return true;
@@ -39,16 +41,19 @@ class DespawningCircle extends Circle {
 		return true;
 	}
 	
+	/** Returns whether or not the circle has been despawned */
 	public function hasDespawned():Bool{
 		return despawnMe;
 	}
 	
+	/** Checks to see if the circle is out of bounds or not */
 	private function isOutOfBounds():Bool{
 		var x = getX();
 		var y = getY();
 		return( x <= -radius || x >= stageWidth+radius || y <= -radius || y >= stageHeight+radius );
 	}
 	
+	/** Gets the distance of the circle to the center of the stage */
 	private function getDistance():Float{
 		return Math.sqrt(Math.pow( getX()-stageWidth/2, 2) + Math.pow(getY()-stageHeight/2, 2) );
 	}
