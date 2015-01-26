@@ -47,7 +47,6 @@ class Sandbox extends starling.display.Sprite {
 		assets.enqueue("../assets/circle_green_glow.png");
 		assets.loadQueue(function(percent){
 			// Ideally we would have some feedback here (loading screen)
-			if 
 			
 			// When percent is 1.0 all assets are loaded
 			if(percent == 1.0){
