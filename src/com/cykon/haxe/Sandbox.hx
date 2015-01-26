@@ -7,6 +7,7 @@
   */
 package com.cykon.haxe;
 
+import com.cykon.haxe.generator.DCircleGenerator;
 import com.cykon.haxe.movable.*;
 import starling.utils.AssetManager;
 import starling.textures.Texture;
@@ -14,6 +15,7 @@ import starling.events.EnterFrameEvent;
 import starling.events.KeyboardEvent;
 import starling.display.Stage;
 import flash.system.System;
+
 
 class Sandbox extends starling.display.Sprite {
 	
@@ -33,9 +35,10 @@ class Sandbox extends starling.display.Sprite {
 	// Reference to the player circle, which the user will control
 	var player : PlayerCircle;
 	
-	// Reference to the main circle array
-	var a_Circle : Array<DespawningCircle> = new Array<DespawningCircle>();
+	// Generator which will spawn enemys periodically
+	var enemyGenerator : DCircleGenerator;
 	
+	// Simple constructor
     public function new() {
         super();
 		populateAssetManager();
@@ -58,41 +61,40 @@ class Sandbox extends starling.display.Sprite {
 	/** Function to be called when we are ready to start the game */
 	private function startGame() {
 		// Instantiate a new player at the center of the screen with radius 15 and speed 15
-		player = new PlayerCircle(assets.getTexture("circle"), globalStage.stageWidth/2.0, globalStage.stageHeight/2.0, 15, 10);
+		player = new PlayerCircle(assets.getTexture("circle"), globalStage.stageWidth/2.0, globalStage.stageHeight/2.0, 15, 4);
 		
 		// Add our player to the scene graph
 		this.addChild(player);
 		
-		// Demo circle object
-		var circle : DespawningCircle = new DespawningCircle(assets.getTexture("circle_green_glow"), 400, 100, 50, globalStage.stageWidth, globalStage.stageHeight);
-		circle.setVelocity(0, 2);
-		a_Circle.push(circle);
-		this.addChild(circle);
-		
+		// Initiate our enemy generator
+		enemyGenerator = new DCircleGenerator(this, assets.getTexture("circle_green_glow"), 1, 5, 10, 20, 200, globalStage.stageWidth, globalStage.stageHeight);
+				
 		// Start the onEnterFrame calls
 		this.addEventListener(EnterFrameEvent.ENTER_FRAME, onEnterFrame);	
 		globalStage.addEventListener(KeyboardEvent.KEY_DOWN, keyDown);
 		globalStage.addEventListener(KeyboardEvent.KEY_UP, keyUp);
 	}
 	
+	var running = true;
 	/** Function called every frame update, main game logic loop */
 	private function onEnterFrame( event:EnterFrameEvent ) {
-		// Calculate how time actually passed
+		if(!running)
+			return;
+			
+		// Create a modifier based on time passed / expected time
 		var modifier = event.passedTime / perfectDeltaTime;
 		
-		if( player.circleHit( a_Circle[0], modifier ) ){
-			a_Circle[0].hitSlide();
-			player.hitSlide();
+		// Check if the player was hit by anything contained in the generator
+		if(enemyGenerator.circleHit( player )){
+			trace("You lose!", flash.Lib.getTimer());
+			running = false;
 		}
 		
-		player.applyVelocity( modifier );
-			
-		// Update circle velocities
-		for( i in 0...a_Circle.length ){
-			a_Circle[i].applyVelocity( modifier );
-			//if(a_Circle[i].hasDespawned())
-			//	trace("nooo");
-		}
+		// Trigger our generator so it can update the objects it's in charge of
+		enemyGenerator.trigger(modifier,flash.Lib.getTimer());
+		
+		// Update the player's position
+		player.applyVelocity(modifier);
 	}
 	
 	/** Used to keep track when a key is pressed down */
