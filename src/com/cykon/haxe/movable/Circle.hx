@@ -57,6 +57,10 @@ class Circle extends starling.display.Image {
 		return radius;
 	}
 	
+	public function getMass() : Float {
+		return Math.PI * radius * radius;
+	}
+	
 	/** Set the location of the circle, (note: this is in relation to the CENTER of the circle) */
 	public function setLoc(x:Float, y:Float){
 		this.x = x - radius;
@@ -140,12 +144,16 @@ class Circle extends starling.display.Image {
 		
 		// If the magnitude of the new regVector is less than the old one... we have a hit!!!
 		if(regVector.mag <= origVector.mag){
+			var hitPosition = regVector.mag / origVector.mag;
 			
-			this.x += regVector.vx;
-			this.y += regVector.vy;
-			this.beenHit = other.beenHit = true;
+			this.x += this.vx*hitPosition;
+			this.y += this.vy*hitPosition;
+			other.x += other.vx*hitPosition;
+			other.y += other.vy*hitPosition;
 			
-			this.hitVector = other.hitVector = Vector.getVector(getX(),getY(),other.getX(),other.getY()).normalize();	
+			this.beenHit = other.beenHit = true;		
+			this.hitVector = Vector.getVector(getX(),getY(),other.getX(),other.getY()).normalize();
+			other.hitVector = this.hitVector.clone();	
 			
 			//this.leftoverMag = thisVector.mag - Vector.getVector(this.x,this.y,this.x-regVector.vx,this.y-regVector.vy).mag;
 			//other.leftoverMag = otherVector.mag;
@@ -157,6 +165,24 @@ class Circle extends starling.display.Image {
 		}
 		
 		return false;
+	}
+	
+	public function realisticBounce( other : Circle ){
+		var otherVector = new Vector(other.vx,other.vy);
+		var thisVector = new Vector(this.vx,this.vy);
+		
+		var a1 = otherVector.dot( hitVector );
+		var a2 = thisVector.dot( hitVector );
+		
+		var hitP = (2.0 * (a1 - a2)) / ( this.getMass() + other.getMass() );
+		
+		otherVector.subtract( other.hitVector.multiply(hitP*this.getMass()) );
+		thisVector.add( this.hitVector.multiply(hitP*other.getMass()));
+		
+		this.vx = thisVector.vx;
+		this.vy = thisVector.vy;
+		other.vx = otherVector.vx;
+		other.vy = otherVector.vy;
 	}
 	
 	/** Recalculates the velocities so it bounces about the point of impact */

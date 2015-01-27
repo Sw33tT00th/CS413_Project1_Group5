@@ -75,6 +75,11 @@ class Vector {
 		return (this.vx*vector.vx + this.vy*vector.vy);
 	}
 	
+	/** Performs a cross product between this and another vector */
+	public function cross( vector : Vector ) : Float {
+		return this.vx*vector.vy - this.vy*vector.vx;	
+	}
+	
 	/** Projects this vector onto another vector */
 	public function onto( vector : Vector ) : Vector{
 		var multiplier = dot(vector) / (vector.mag*vector.mag);

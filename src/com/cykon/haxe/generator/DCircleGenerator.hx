@@ -53,6 +53,16 @@ class DCircleGenerator {
 		return false;
 	}
 	
+	public function generateBoss(texture:Texture, player:Circle) : DespawningCircle {
+		var targetX = stageWidth/2;
+		var targetY = stageHeight/2;
+		var circle = new TrackingCircle(texture, targetX - 1000, targetY, 100, stageWidth, stageHeight, player);
+		circle.setVelocity(2,0);
+		parent.addChild(circle);
+		a_Circle.add(circle);
+		return circle;
+	}
+	
 	/** Generates and adds a new circle to the generator's list */
 	public function generate() : DespawningCircle{
 		// Coordinates which the circle will fly towards
@@ -102,12 +112,13 @@ class DCircleGenerator {
 		for( circle in a_Circle ){
 			for( hcircle in a_Circle ){
 				if( hcircle != circle && !hcircle.hasBeenHit() && circle.circleHit(hcircle, modifier)){
+					circle.realisticBounce(hcircle);
 					break;
 				}
 			}
 			
 			// Apply the bounce effect to the circle (only works if it was hit)
-			circle.hitBounce();
+			//circle.hitBounce();
 			
 			// Update the circle's velocity
 			circle.applyVelocity( modifier );

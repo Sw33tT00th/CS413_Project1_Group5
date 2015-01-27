@@ -15,7 +15,8 @@ import starling.events.EnterFrameEvent;
 import starling.events.KeyboardEvent;
 import starling.display.Stage;
 import flash.system.System;
-
+import com.cykon.haxe.cmath.Polynomial;
+import com.cykon.haxe.cmath.Vector;
 
 class Sandbox extends starling.display.Sprite {
 	
@@ -45,6 +46,15 @@ class Sandbox extends starling.display.Sprite {
 	// Simple constructor
     public function new() {
         super();
+		
+		var c1 = new Vector(0,5);
+		var v1 = new Vector(5,-15);
+		var r1 = 2;
+		
+		var c2 = new Vector(0,0);
+		var v2 = new Vector(5,15);
+		var r2 = 2;
+		
 		populateAssetManager();
     }
 	
@@ -53,6 +63,7 @@ class Sandbox extends starling.display.Sprite {
 		assets.enqueue("../assets/circle.png");
 		assets.enqueue("../assets/circle_point.png");
 		assets.enqueue("../assets/circle_green_glow.png");
+		assets.enqueue("../assets/circle_green_boss.png");
 		assets.loadQueue(function(percent){
 			// Ideally we would have some feedback here (loading screen)
 			
@@ -72,7 +83,7 @@ class Sandbox extends starling.display.Sprite {
 		this.addChild(player);
 		
 		// Initiate our enemy generator
-		enemyGenerator = new DCircleGenerator(this, assets.getTexture("circle_green_glow"), 1, 5, 10, 70, 100, globalStage.stageWidth, globalStage.stageHeight);
+		enemyGenerator = new DCircleGenerator(this, assets.getTexture("circle_green_glow"), 1, 5, 10, 70, 500, globalStage.stageWidth, globalStage.stageHeight);
 		pointGenerator = new SCircleGenerator(this, assets.getTexture("circle_point"), 20, globalStage.stageWidth, globalStage.stageHeight);
 		pointGenerator.generate();
 		
@@ -117,6 +128,10 @@ class Sandbox extends starling.display.Sprite {
 	/** Used to keep track of when a key is unpressed */
 	private function keyUp(event:KeyboardEvent){
 		player.keyUp(event.keyCode);
+		
+		if(event.keyCode == 32){
+			enemyGenerator.generateBoss(assets.getTexture("circle_green_boss"), player);
+		}		
 	}
 	
 	/** Main method, used to set up the initial game instance */
@@ -129,7 +144,7 @@ class Sandbox extends starling.display.Sprite {
 			var starling = new starling.core.Starling(Sandbox, flash.Lib.current.stage);
 			//starling.antiAliasing = 16;
             globalStage = starling.stage; 
-			starling.start();
+			starling.start();  
         } catch(e:Dynamic){
             trace(e);
         }
