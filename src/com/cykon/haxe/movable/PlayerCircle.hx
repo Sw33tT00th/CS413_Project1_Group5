@@ -13,10 +13,10 @@ import starling.textures.Texture;
 
 class PlayerCircle extends Circle {
 	// Numerical key mappings to different directions
-	private var K_UP : Int		= 87;
-	private var K_LEFT : Int	= 65;
-	private var K_DOWN : Int	= 83;
-	private var K_RIGHT : Int	= 68;
+	public var K_UP : Int		= 87;
+	public var K_LEFT : Int	= 65;
+	public var K_DOWN : Int	= 83;
+	public var K_RIGHT : Int	= 68;
 	
 	// Map to contain whether or not a key is pressed at any moment
 	private var keyMap : Map<Int, Bool> = new Map<Int, Bool>();

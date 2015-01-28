@@ -17,7 +17,7 @@ class DCircleGenerator {
 	
 	var parent : Sprite;	  // Parent container object
 	var texture : Texture;	  // Texture to spawn circles with
-	var interval : Float;	  // Millisecond interval to spawn circles at
+	var interval : Int;	  // Millisecond interval to spawn circles at
 	var stageWidth : Float;	  // Stage Width
 	var stageHeight : Float;  // Stage Height
 	var spawnDist : Float;	  // Distance from stage to spawn circles
@@ -31,7 +31,7 @@ class DCircleGenerator {
 	// List used to keep track of circle objects
 	var a_Circle : List<DespawningCircle> = new List<DespawningCircle>();
 	
-	public function new(parent : Sprite, texture : Texture, minSpeed : Float, maxSpeed : Float, minRadius : Float, maxRadius : Float, interval : Float, stageWidth : Float, stageHeight : Float){
+	public function new(parent : Sprite, texture : Texture, minSpeed : Float, maxSpeed : Float, minRadius : Float, maxRadius : Float, interval : Int, stageWidth : Float, stageHeight : Float){
 		this.parent = parent;
 		this.texture = texture;
 		this.minSpeed = minSpeed;
@@ -42,6 +42,14 @@ class DCircleGenerator {
 		this.stageWidth = stageWidth;
 		this.stageHeight = stageHeight;
 		this.spawnDist = Math.max(stageWidth,stageHeight)*1.2;
+	}
+	
+	public function getInterval():Int{
+		return interval;
+	}
+	
+	public function setInterval(interval:Int){
+		this.interval = interval;
 	}
 	
 	/** External hit detection method to check whether or not any circles have been hit by something */
