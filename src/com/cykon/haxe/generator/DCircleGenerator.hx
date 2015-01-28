@@ -54,20 +54,18 @@ class DCircleGenerator {
 	}
 	
 	public function generateBoss(texture:Texture, player:Circle) : DespawningCircle {
-		var targetX = stageWidth/2;
-		var targetY = stageHeight/2;
-		var circle = new TrackingCircle(texture, targetX - 1000, targetY, 100, stageWidth, stageHeight, player);
-		circle.setVelocity(2,0);
-		parent.addChild(circle);
-		a_Circle.add(circle);
-		return circle;
+		return generate(texture,player);
 	}
 	
 	/** Generates and adds a new circle to the generator's list */
-	public function generate() : DespawningCircle{
+	public function generate(texture:Texture = null, player:Circle = null) : DespawningCircle{
+		if(texture == null)
+			texture = this.texture;
+		
 		// Coordinates which the circle will fly towards
 		var targetX = Math.random() * stageWidth;
 		var targetY = Math.random() * stageHeight;
+		
 		
 		// Randomized angle to spawn the circle away from target coords
 		var randAngle = Math.random() * Math.PI*2;
@@ -88,6 +86,13 @@ class DCircleGenerator {
 		var radius = Math.random()*(maxRadius - minRadius) + minRadius;
 		var speed = Math.random()*(maxSpeed - minSpeed) + minSpeed;
 		var circle = new DespawningCircle(texture, targetX+vector.vx, targetY+vector.vy, radius, stageWidth, stageHeight);
+		
+		if(player != null) {
+			var boss = new TrackingCircle(texture, targetX+vector.vx, targetY+vector.vy, 100, stageWidth, stageHeight, player);
+			boss.setMassMod(100);
+			boss.setMaxAngle(0.01);
+			circle = boss;
+		}
 		
 		// Get the velocity vector of the circle
 		vector = vector.normalize().multiply(speed).getOpposite();

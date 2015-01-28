@@ -83,9 +83,10 @@ class Sandbox extends starling.display.Sprite {
 		this.addChild(player);
 		
 		// Initiate our enemy generator
-		enemyGenerator = new DCircleGenerator(this, assets.getTexture("circle_green_glow"), 1, 5, 10, 70, 500, globalStage.stageWidth, globalStage.stageHeight);
+		enemyGenerator = new DCircleGenerator(this, assets.getTexture("circle_green_glow"), 1, 5, 10, 70, 500, globalStage.stageWidth, globalStage.stageHeight);		
 		pointGenerator = new SCircleGenerator(this, assets.getTexture("circle_point"), 20, globalStage.stageWidth, globalStage.stageHeight);
 		pointGenerator.generate();
+		
 		
 		// Start the onEnterFrame calls
 		this.addEventListener(EnterFrameEvent.ENTER_FRAME, onEnterFrame);	
@@ -105,6 +106,10 @@ class Sandbox extends starling.display.Sprite {
 		if(pointGenerator.circleHit( player )){
 			points += 10;
 			pointGenerator.generate();
+			
+			if(points % 50 == 0){
+				enemyGenerator.generateBoss(assets.getTexture("circle_green_boss"), player);
+			}
 		}
 		
 		// Check if the player was hit by anything contained in the generator
@@ -130,7 +135,7 @@ class Sandbox extends starling.display.Sprite {
 		player.keyUp(event.keyCode);
 		
 		if(event.keyCode == 32){
-			enemyGenerator.generateBoss(assets.getTexture("circle_green_boss"), player);
+			//enemyGenerator.generateBoss(assets.getTexture("circle_green_boss"), player);
 		}		
 	}
 	

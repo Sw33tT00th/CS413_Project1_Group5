@@ -61,6 +61,23 @@ class Vector {
 		return this;
 	}
 	
+	/** Rotates the vector */
+	public function rotate(radian:Float) : Vector{
+		if(radian == 0)
+			return this;
+			
+		var cos = Math.cos(radian);
+		var sin = Math.sin(radian);
+		
+		var nvx = vx*cos - vy*sin;
+		var nvy = vx*sin + vy*cos;
+		
+		vx = nvx;
+		vy = nvy;
+		
+		return this;
+	}
+	
 	/** Adds some magnitude to this vector */
 	public function addMagnitude(magnitude:Float):Vector{
 		if(magnitude == 0)
@@ -77,7 +94,7 @@ class Vector {
 	
 	/** Performs a cross product between this and another vector */
 	public function cross( vector : Vector ) : Float {
-		return this.vx*vector.vy - this.vy*vector.vx;	
+		return (this.vx*vector.vy - this.vy*vector.vx) % (Math.PI*2);	
 	}
 	
 	/** Projects this vector onto another vector */
@@ -85,6 +102,16 @@ class Vector {
 		var multiplier = dot(vector) / (vector.mag*vector.mag);
 		var newVector = new Vector(multiplier*vector.vx, multiplier*vector.vy);
 		return newVector;
+	}
+	
+	/** Gets the angle between two vectors */
+	public function getVectorAngle( vector : Vector ) : Float{
+		return Math.atan2(vy,vx) - Math.atan2(vector.vy,vector.vx);
+	}
+	
+	/** Returns the angle of this vector */
+	public function getAngle() : Float{
+		return Math.atan2(vy,vx);
 	}
 	
 	/** Obtains a perpendicular vector */
@@ -95,11 +122,6 @@ class Vector {
 	/** Returns a vector in the opposite direction */
 	public function getOpposite() : Vector{
 		return new Vector(-vx,-vy);
-	}
-	
-	/** Returns the angle of this vector */
-	public function getAngle() : Float{
-		return Math.atan2(vy,vx);
 	}
 	
 	/** Updates this vector's magnitude */

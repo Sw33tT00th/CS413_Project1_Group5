@@ -15,39 +15,27 @@ import com.cykon.haxe.cmath.Vector;
 class TrackingCircle extends DespawningCircle {
 
 	private var trackCircle : Circle;
-	private var maxAngle : Float = Math.PI*2;
+
+	public override function getMass(){
+		return super.getMass()*10;
+	}
 	
 	public function new(texture:Texture, x:Float, y:Float, radius:Float, stageWidth:Float, stageHeight:Float, trackCircle : Circle){
 		super(texture, x, y, radius, stageWidth, stageHeight);
 		this.trackCircle = trackCircle;
 	}
 	
-	public function setMaxAngle(maxAngle:Float){
-		this.maxAngle = maxAngle;
-	}
-	
 	/** Overriden version of the Circle's apply velocity,
-	  * Follow the player! Hurrah!*/
+	  * If the circle isnt heading towards the center && it's off screen, we despawn it */
 	public override function applyVelocity(modifier:Float):Bool{	
 		var returnVal = super.applyVelocity(modifier);
 		
 		var thisVector = new Vector(vx,vy);
 		var directVector = Vector.getVector(getX(),getY(),trackCircle.getX(),trackCircle.getY());
-		var angle = directVector.getVectorAngle( thisVector );
 		
-		// Angle correction
-		if(Math.abs(angle) > Math.PI){
-			angle -= angle/Math.abs(angle)*2*Math.PI;
-		}
-			
-		// Apply a maximum angle if the angle is greater than that
-		if(Math.abs(angle) > maxAngle){
-			angle = angle/Math.abs(angle) * maxAngle;
-		}
-		
-		thisVector = thisVector.rotate(angle);	
-		vx = thisVector.vx;
-		vy = thisVector.vy;
+		directVector.normalize().multiply( thisVector.mag );
+		vx = directVector.vx;
+		vy = directVector.vy;
 		
 		return returnVal;
 	}

@@ -22,7 +22,6 @@ class Circle extends starling.display.Image {
 	var beenHit:Bool = false;  // Tells the updateVelocity method whether we can move or not
 	var hitVector:Vector;	   // The normal vector representing a wall which was hit
 	var leftoverMag:Float = 0; // The leftover magnitude from the last hit;
-	var massMod = 1.0;		   // Modifier to change mass by...
 	
 	public function hasBeenHit() : Bool {
 		return beenHit;
@@ -58,14 +57,8 @@ class Circle extends starling.display.Image {
 		return radius;
 	}
 	
-	/** Returns the mass of this object */
 	public function getMass() : Float {
-		return Math.PI * radius * radius * massMod;
-	}
-	
-	/** Set the density of the mass of this object */
-	public function setMassMod(massMod:Float){
-		this.massMod = massMod;
+		return Math.PI * radius * radius;
 	}
 	
 	/** Set the location of the circle, (note: this is in relation to the CENTER of the circle) */
