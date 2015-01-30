@@ -128,19 +128,11 @@ class Circle extends starling.display.Image {
 	
 	/** Test if this circle has collided with another circle */
 	public function circleHit( other : Circle, modifier : Float = 1.0 ) : Bool{
-		if(boundingVectorHit(other,modifier))
-			return false;
-			
-		leftoverMag = 0;
-		//If leftover Mag is -1, we can set it to use the full magnitude
+		//if(boundingVectorHit(other,modifier))
+		//	return false;
 		
 		var otherVector = new Vector(other.vx,other.vy);
 		var thisVector = new Vector(this.vx,this.vy);
-		
-		if(other.leftoverMag != 0)
-			otherVector.normalize().multiply(other.leftoverMag);
-		if(this.leftoverMag != 0)
-			thisVector.normalize().multiply(this.leftoverMag);
 					
 		// Translate the movement vector of the two circles as if one wasn't moving
 		var origVector = thisVector.clone().subtract(otherVector).multiply(modifier).addMagnitude(leftoverMag);
@@ -178,20 +170,14 @@ class Circle extends starling.display.Image {
 		if(regVector.mag <= origVector.mag){
 			var hitPosition = regVector.mag / origVector.mag;
 			
-			this.x += this.vx*hitPosition;
-			this.y += this.vy*hitPosition;
-			other.x += other.vx*hitPosition;
-			other.y += other.vy*hitPosition;
+			this.x += this.vx*modifier*hitPosition;
+			this.y += this.vy*modifier*hitPosition;
+			other.x += other.vx*modifier*hitPosition;
+			other.y += other.vy*modifier*hitPosition;
 			
 			this.beenHit = other.beenHit = true;		
 			this.hitVector = Vector.getVector(getX(),getY(),other.getX(),other.getY()).normalize();
 			other.hitVector = this.hitVector.clone();	
-			
-			//this.leftoverMag = thisVector.mag - Vector.getVector(this.x,this.y,this.x-regVector.vx,this.y-regVector.vy).mag;
-			//other.leftoverMag = otherVector.mag;
-			
-			//if(this.leftoverMag < 0)
-			//	this.leftoverMag = 0;
 			
 			return true;
 		}

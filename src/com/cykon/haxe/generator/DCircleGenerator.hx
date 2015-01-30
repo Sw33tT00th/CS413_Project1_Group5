@@ -53,9 +53,9 @@ class DCircleGenerator {
 	}
 	
 	/** External hit detection method to check whether or not any circles have been hit by something */
-	public function circleHit( circle : Circle ) : Bool {
+	public function circleHit( circle : Circle, modifier:Float=1.0 ) : Bool {
 		for( hcircle in a_Circle ){
-			if( circle.circleHit( hcircle ) )
+			if( circle.circleHit( hcircle,modifier ) )
 				return true;
 		}
 		return false;

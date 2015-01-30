@@ -21,7 +21,7 @@ import com.cykon.haxe.cmath.Vector;
 class Sandbox extends starling.display.Sprite {
 	
 	// The desired frame rate which the game should run at
-	static var frameRate : Int = 60;
+	static var frameRate : Int = 30;
 	
 	/* The 'perfect' update time, used to modify velocities in case
 	   the game is not quite running at $frameRate */
@@ -124,7 +124,7 @@ class Sandbox extends starling.display.Sprite {
 		for(player in a_Player){
 			if(player.isAlive){
 				// Check to see if this player has hit a point in the point generator
-				if(pointGenerator.circleHit( player )){
+				if(pointGenerator.circleHit( player, modifier )){
 					increasePointCounter(player);
 					pointGenerator.generate(); 		// Spawn a new point object
 					
@@ -160,7 +160,7 @@ class Sandbox extends starling.display.Sprite {
 				}
 				
 				// Check if the player was hit by anything contained in the enemy generator
-				if(enemyGenerator.circleHit( player )){
+				if(enemyGenerator.circleHit( player, modifier )){
 					revivePoints = 0;
 					player.isAlive = false;
 					player.removeFromParent();
@@ -173,7 +173,7 @@ class Sandbox extends starling.display.Sprite {
 				// Process collisions between players
 				for(p2 in a_Player){
 					if(p2.isAlive && player != p2){
-						if(player.circleHit(p2))
+						if(player.circleHit(p2,modifier))
 						player.realisticBounce(p2);
 					}
 				}
@@ -181,7 +181,7 @@ class Sandbox extends starling.display.Sprite {
 		}
 		
 		// Update the enemy positions
-		enemyGenerator.trigger(modifier,flash.Lib.getTimer());
+		enemyGenerator.trigger(modifier, flash.Lib.getTimer());
 		
 		// Update the player positions
 		for(player in a_Player)
@@ -213,7 +213,7 @@ class Sandbox extends starling.display.Sprite {
 		}
 		
 		// Bring in a second player (up arrow)
-		if(event.keyCode == 38 && a_Player.length < 2){
+		if(event.keyCode == 38 && a_Player.length < 2 && numAlivePlayers() != 0){
 			var player = new PlayerCircle(assets.getTexture("circle2"), globalStage.stageWidth/2.0, globalStage.stageHeight/2.0, 25, 8);
 			player.K_LEFT 	= 37;
 			player.K_UP 	= 38;
@@ -265,12 +265,11 @@ class Sandbox extends starling.display.Sprite {
 	/** Main method, used to set up the initial game instance */
     public static function main() {
 		// Frame rate the game ~should~ run at
-		flash.Lib.current.stage.frameRate = 60;
 		
         try {
-			// Attempt to start the game logic
+			// Attempt to start the game logic 
 			var starling = new starling.core.Starling(Sandbox, flash.Lib.current.stage);
-			//starling.antiAliasing = 16;
+			starling.showStats = true;
             globalStage = starling.stage; 
 			starling.start();  
         } catch(e:Dynamic){

@@ -1,7 +1,7 @@
 all:
 	mkdir -p bin
 	haxe -cp src \
-	-swf-header 1280:720:60:000000 \
+	-swf-header 1280:720:120:000000 \
 	-swf-version 11.3 \
 	-swf bin/Sandbox.swf \
 	-swf-lib starling.swc \
