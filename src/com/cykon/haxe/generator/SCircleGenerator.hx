@@ -61,7 +61,7 @@ class SCircleGenerator {
 		
 		var circle = new Circle(texture, targetX, targetY, radius);
 
-		parent.addChild(circle);
+		parent.addChildAt(circle,0);
 		a_Circle.add(circle);
 		return circle;
 	}

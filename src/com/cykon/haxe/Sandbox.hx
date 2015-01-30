@@ -14,6 +14,8 @@ import starling.textures.Texture;
 import starling.events.EnterFrameEvent;
 import starling.events.KeyboardEvent;
 import starling.display.Stage;
+import starling.display.Quad;
+import starling.text.TextField;
 import flash.system.System;
 import com.cykon.haxe.cmath.Polynomial;
 import com.cykon.haxe.cmath.Vector;
@@ -45,6 +47,7 @@ class Sandbox extends starling.display.Sprite {
 	var revivePoints = -1;
 	var running = true;
 	var frequency = 50;
+	var scoreText:TextField = null;
 	
 	// Simple constructor
     public function new() {
@@ -73,12 +76,6 @@ class Sandbox extends starling.display.Sprite {
 			
 			// When percent is 1.0 all assets are loaded
 			if(percent == 1.0){
-				startGame();
-				pointGenerator.hideChildren();
-				for(player in a_Player){
-					player.isAlive = false;
-					this.removeChild(player);
-				}
 				startScreen();
 			}
 		});
@@ -110,6 +107,13 @@ class Sandbox extends starling.display.Sprite {
 		this.addEventListener(EnterFrameEvent.ENTER_FRAME, onEnterFrame);	
 		globalStage.addEventListener(KeyboardEvent.KEY_DOWN, keyDown);
 		globalStage.addEventListener(KeyboardEvent.KEY_UP, keyUp);
+	
+		scoreText = new TextField(100,25, "0");
+		scoreText.fontSize = 12;
+		scoreText.color = 0xFFFFFF;
+		scoreText.hAlign = "left";
+		scoreText.x = 5;
+		addChild(scoreText);
 	}
 	
 	
@@ -119,7 +123,7 @@ class Sandbox extends starling.display.Sprite {
 			return;
 			
 		// Create a modifier based on time passed / expected time
-		var modifier = event.passedTime / perfectDeltaTime;
+		var modifier = (event == null) ? 1.0 : event.passedTime / perfectDeltaTime;
 		
 		for(player in a_Player){
 			if(player.isAlive){
@@ -133,8 +137,9 @@ class Sandbox extends starling.display.Sprite {
 						revivePoints += 1;
 						
 						if(revivePoints == 9)
-							trace("REVIVE INCOMING!!!");
+							scoreText.color = 0xAAFFFF;
 						else if(revivePoints == 10){
+							scoreText.color = 0xFFFFFF;
 							revivePoints = -1;
 							haxe.Log.clear();
 							
@@ -235,18 +240,42 @@ class Sandbox extends starling.display.Sprite {
 			for(player in a_Player)
 				enemyGenerator.generateBoss(assets.getTexture("circle_green_boss"), player);
 		}
+		
+		scoreText.text = "" + points;
 	}
 	
 	/** Do stuff with the menu screen */
 	private function startScreen(){
-		trace("Hit 'space' to begin!");
-		trace("Controls are wsad.");
+		startGame();
+		pointGenerator.hideChildren();
+		for(player in a_Player){
+			player.isAlive = false;
+			this.removeChild(player);
+		}
+
+		var overlay = new Quad(globalStage.stageWidth, globalStage.stageHeight, 0, true);			
+		overlay.alpha = 0.7;
+		addChild(overlay);
+		
+		var menuText = new TextField(globalStage.stageWidth, globalStage.stageHeight, "Surviving Georgas\n\nUse WASD to move!\n\nPress <SPACE> to play.");
+		menuText.fontSize = 18;
+		menuText.color = 0xFFFFFF;
+		addChild(menuText);
+		
+		for(i in 1...15)
+			enemyGenerator.generate();
 	}
 	
 	/** The game is over! */
-	private function triggerGameOver(){
-		trace("You lose! " + "Score: " + points + " | Time: " + flash.Lib.getTimer());
-		//running = false;
+	private function triggerGameOver(){		
+		var overlay = new Quad(globalStage.stageWidth, globalStage.stageHeight, 0, true);			
+		overlay.alpha = 0.7;
+		addChild(overlay);
+		
+		var menuText = new TextField(globalStage.stageWidth, globalStage.stageHeight, "You lose!\n\nFinal Score: " + points + "\nTime: " + flash.Lib.getTimer()/1000 + " seconds\n\nPress <SPACE> to restart");
+		menuText.fontSize = 18;
+		menuText.color = 0xFFFFFF;
+		addChild(menuText);
 	}
 	
 	/** Restart the game */
@@ -269,7 +298,7 @@ class Sandbox extends starling.display.Sprite {
         try {
 			// Attempt to start the game logic 
 			var starling = new starling.core.Starling(Sandbox, flash.Lib.current.stage);
-			starling.showStats = true;
+			//starling.showStats = true;
             globalStage = starling.stage; 
 			starling.start();  
         } catch(e:Dynamic){

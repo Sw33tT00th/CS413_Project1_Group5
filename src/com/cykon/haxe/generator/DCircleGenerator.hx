@@ -41,7 +41,7 @@ class DCircleGenerator {
 		this.interval = interval;
 		this.stageWidth = stageWidth;
 		this.stageHeight = stageHeight;
-		this.spawnDist = Math.max(stageWidth,stageHeight)*1.2;
+		this.spawnDist = Math.max(stageWidth,stageHeight)*1.0;
 	}
 	
 	public function getInterval():Int{
@@ -79,7 +79,9 @@ class DCircleGenerator {
 		var randAngle = Math.random() * Math.PI*2;
 		
 		// New vector representing the spawn location
-		var vector = new Vector(1,randAngle).normalize().multiply(spawnDist);
+		var radius = Math.random()*(maxRadius - minRadius) + minRadius;
+		var speed = Math.random()*(maxSpeed - minSpeed) + minSpeed;
+		var vector = new Vector(1,randAngle).normalize().multiply(spawnDist+radius);
 		
 		// Randomize the quadrant which the circle will spawn in (default only spawns in the bottom right quadrent
 		var quad = Math.round( Math.random() * 3 );
@@ -91,8 +93,6 @@ class DCircleGenerator {
 			vector = vector.getOpposite().getPerpendicular();
 		
 		// Create a new circle instance
-		var radius = Math.random()*(maxRadius - minRadius) + minRadius;
-		var speed = Math.random()*(maxSpeed - minSpeed) + minSpeed;
 		var circle = new DespawningCircle(texture, targetX+vector.vx, targetY+vector.vy, radius, stageWidth, stageHeight);
 		
 		if(player != null) {
@@ -107,7 +107,7 @@ class DCircleGenerator {
 		circle.setVelocity(vector.vx,vector.vy);
 		
 		// Add the new circle to the graph && the list
-		parent.addChild(circle);
+		parent.addChildAt(circle,0);
 		a_Circle.add(circle);
 		return circle;
 	}
