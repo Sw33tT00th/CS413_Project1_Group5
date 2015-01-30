@@ -63,11 +63,11 @@ class Sandbox extends starling.display.Sprite {
 	
 	/** Function used to load in any assets to be used during the game */
 	private function populateAssetManager() {
-		assets.enqueue("../assets/circle.png");
-		assets.enqueue("../assets/circle2.png");
-		assets.enqueue("../assets/circle_point.png");
-		assets.enqueue("../assets/circle_green_glow.png");
-		assets.enqueue("../assets/circle_green_boss.png");
+		assets.enqueue("assets/circle.png");
+		assets.enqueue("assets/circle2.png");
+		assets.enqueue("assets/circle_point.png");
+		assets.enqueue("assets/circle_green_glow.png");
+		assets.enqueue("assets/circle_green_boss.png");
 		assets.loadQueue(function(percent){
 			// Ideally we would have some feedback here (loading screen)
 			

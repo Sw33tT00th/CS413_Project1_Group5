@@ -104,8 +104,33 @@ class Circle extends starling.display.Image {
 		return true;
 	}
 	
+	private function simpleSort(a:Float,b:Float):Int{
+		if(a < b) return -1;
+		if(a > b) return 1;
+		return 0;
+	}
+	
+	public function boundingVectorHit( circle : Circle, modifier : Float = 1.0 ):Bool{
+		var xBound = [this.getX(), this.getX() + this.vx*modifier];
+		var yBound = [this.getY(), this.getY() + this.vy*modifier];
+		
+		var XBound = [circle.getX(), circle.getX() + circle.vx*modifier];
+		var YBound = [circle.getY(), circle.getY() + circle.vy*modifier];
+	
+		xBound.sort(simpleSort);  	yBound.sort(simpleSort);
+		XBound.sort(simpleSort);  	YBound.sort(simpleSort);
+		
+		return !(XBound[0] > xBound[1]
+			  || XBound[1] < xBound[0]
+		      || YBound[0] > yBound[1]
+			  || YBound[1] < yBound[0]);
+	}
+	
 	/** Test if this circle has collided with another circle */
 	public function circleHit( other : Circle, modifier : Float = 1.0 ) : Bool{
+		if(boundingVectorHit(other,modifier))
+			return false;
+			
 		leftoverMag = 0;
 		//If leftover Mag is -1, we can set it to use the full magnitude
 		
