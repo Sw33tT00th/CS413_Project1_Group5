@@ -26,6 +26,8 @@ class PlayerCircle extends Circle {
 	
 	// Angle speed the player will move at
 	private var angleSpeed : Float;
+	public var isAlive : Bool = true;
+	
 	
     public function new(texture:Texture, x:Float, y:Float, radius:Float, moveSpeed:Float){
         super(texture, x, y, radius);
@@ -74,12 +76,14 @@ class PlayerCircle extends Circle {
 	}
 	
 	public override function applyVelocity(modifier:Float):Bool{
-		//updateVelocity();
-		var applied = super.applyVelocity(modifier);
-		if(applied){
-			updateVelocity();
+		if(isAlive){
+			var applied = super.applyVelocity(modifier);
+			if(applied){
+				updateVelocity();
+			}			
+			return applied;
 		}
 		
-		return applied;
+		return false;
 	}
 }

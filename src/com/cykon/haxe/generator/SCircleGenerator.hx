@@ -46,6 +46,13 @@ class SCircleGenerator {
 		return false;
 	}
 	
+	/** Removes all points from their parents */
+	public function hideChildren(){
+		for( hcircle in a_Circle){
+			hcircle.removeFromParent();
+		}
+	}
+	
 	/** Generates and adds a new circle to the generator's list */
 	public function generate() : Circle{
 		// Coordinates which the circle will fly towards

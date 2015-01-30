@@ -42,9 +42,9 @@ class Sandbox extends starling.display.Sprite {
 	// Generator which will spawn points!
 	var pointGenerator : SCircleGenerator;
 	var points = 0;
+	var revivePoints = -1;
 	var running = true;
 	var frequency = 50;
-	var playerJoined = false;
 	
 	// Simple constructor
     public function new() {
@@ -74,6 +74,12 @@ class Sandbox extends starling.display.Sprite {
 			// When percent is 1.0 all assets are loaded
 			if(percent == 1.0){
 				startGame();
+				pointGenerator.hideChildren();
+				for(player in a_Player){
+					player.isAlive = false;
+					this.removeChild(player);
+				}
+				startScreen();
 			}
 		});
 	}
@@ -94,9 +100,10 @@ class Sandbox extends starling.display.Sprite {
 		pointGenerator = new SCircleGenerator(this, assets.getTexture("circle_point"), 20, globalStage.stageWidth, globalStage.stageHeight);
 		pointGenerator.generate();
 		
+		// Reset some variables
 		points = 0;
 		running = true;
-		playerJoined = false;
+		revivePoints = -1;
 		haxe.Log.clear();
 		
 		// Start the onEnterFrame calls
@@ -114,43 +121,79 @@ class Sandbox extends starling.display.Sprite {
 		// Create a modifier based on time passed / expected time
 		var modifier = event.passedTime / perfectDeltaTime;
 		
-		for(player in a_Player)
-			if(pointGenerator.circleHit( player )){
-				points += 10;
-				pointGenerator.generate();
-				
-				if(points % frequency == 0){
-					for(player in a_Player)
-						enemyGenerator.generateBoss(assets.getTexture("circle_green_boss"), player);
-				}
-			}
-		
-		
-		// Check if the player was hit by anything contained in the generator
 		for(player in a_Player){
-			if(enemyGenerator.circleHit( player )){
-				a_Player.remove(player);
-				player.removeFromParent();
-				if(a_Player.length == 0){
-					trace("You lose! " + "Score: " + points + " | Time: " + flash.Lib.getTimer());
-					running = false;
+			if(player.isAlive){
+				// Check to see if this player has hit a point in the point generator
+				if(pointGenerator.circleHit( player )){
+					increasePointCounter(player);
+					pointGenerator.generate(); 		// Spawn a new point object
+					
+					// Work with the revivePoint counter to possibly revive dead player
+					if(revivePoints > -1){
+						revivePoints += 1;
+						
+						if(revivePoints == 9)
+							trace("REVIVE INCOMING!!!");
+						else if(revivePoints == 10){
+							revivePoints = -1;
+							haxe.Log.clear();
+							
+							// Find an alive player
+							var alivePlayer : PlayerCircle = null;
+							for(player in a_Player){
+								if(player.isAlive){
+									alivePlayer = player;
+								}
+							}
+							
+							// Respawn the other players  on top of the alive player
+							for(player in a_Player){
+								if(player != alivePlayer){
+									player.isAlive = true;
+									player.x = alivePlayer.x;
+									player.y = alivePlayer.y;
+									this.addChild(player);
+								}
+							}
+						}
+					}
 				}
-			}
-			
-			for(p2 in a_Player){
-				if(player != p2){
-					if(player.circleHit(p2))
-					player.realisticBounce(p2);
+				
+				// Check if the player was hit by anything contained in the enemy generator
+				if(enemyGenerator.circleHit( player )){
+					revivePoints = 0;
+					player.isAlive = false;
+					player.removeFromParent();
+					
+					if(numAlivePlayers() == 0){
+						triggerGameOver();
+					}
+				}
+				
+				// Process collisions between players
+				for(p2 in a_Player){
+					if(p2.isAlive && player != p2){
+						if(player.circleHit(p2))
+						player.realisticBounce(p2);
+					}
 				}
 			}
 		}
 		
-		// Trigger our generator so it can update the objects it's in charge of
+		// Update the enemy positions
 		enemyGenerator.trigger(modifier,flash.Lib.getTimer());
 		
-		// Update the player's position
+		// Update the player positions
 		for(player in a_Player)
 			player.applyVelocity(modifier);
+	}
+	
+	/** Return the number of players currently alive */
+	private function numAlivePlayers() : Int {
+		var alivePlayers = 0;
+		for(player in a_Player)
+			alivePlayers += (player.isAlive) ? 1 : 0;
+		return alivePlayers;	
 	}
 	
 	/** Used to keep track when a key is pressed down */
@@ -158,32 +201,63 @@ class Sandbox extends starling.display.Sprite {
 		for(player in a_Player)
 			player.keyDown(event.keyCode);
 			
+		// Restart the game (space)
 		if(event.keyCode == 32){
-			this.removeChildren();
-			this.removeEventListeners();
-			startGame();
+			restartGame();
 		}
 		
+		// Enable a much harder mode (h)
 		if(event.keyCode == 72){
 			trace("HARD MODE ENGAGED.");
 			frequency = 10;
 		}
 		
-		if(event.keyCode == 38 && !playerJoined){
+		// Bring in a second player (up arrow)
+		if(event.keyCode == 38 && a_Player.length < 2){
 			var player = new PlayerCircle(assets.getTexture("circle2"), globalStage.stageWidth/2.0, globalStage.stageHeight/2.0, 25, 8);
-			player.K_LEFT = 37;
-			player.K_UP = 38;
-			player.K_RIGHT = 39;
-			player.K_DOWN = 40;
+			player.K_LEFT 	= 37;
+			player.K_UP 	= 38;
+			player.K_RIGHT 	= 39;
+			player.K_DOWN 	= 40;
 			
-			playerJoined = true;
 			this.addChild(player);
 			a_Player.add(player);
 		}
 	}
 	
+	/** Increase player points */
+	private function increasePointCounter(player:PlayerCircle){
+		// Increment point counter
+		points += 10;
+					
+		// Spawn a boss circle on each player if frequency is met
+		if(points % frequency == 0){
+			for(player in a_Player)
+				enemyGenerator.generateBoss(assets.getTexture("circle_green_boss"), player);
+		}
+	}
+	
+	/** Do stuff with the menu screen */
+	private function startScreen(){
+		trace("Hit 'space' to begin!");
+		trace("Controls are wsad.");
+	}
+	
+	/** The game is over! */
+	private function triggerGameOver(){
+		trace("You lose! " + "Score: " + points + " | Time: " + flash.Lib.getTimer());
+		//running = false;
+	}
+	
+	/** Restart the game */
+	private function restartGame(){
+		this.removeChildren();
+			this.removeEventListeners();
+			startGame();
+	}
+	
 	/** Used to keep track of when a key is unpressed */
-	private function keyUp(event:KeyboardEvent){
+	private function keyUp(event:KeyboardEvent):Void{
 		for(player in a_Player)
 			player.keyUp(event.keyCode);
 	}
