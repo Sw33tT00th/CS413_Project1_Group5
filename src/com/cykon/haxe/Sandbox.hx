@@ -48,6 +48,7 @@ class Sandbox extends starling.display.Sprite {
 	var running = true;
 	var frequency = 50;
 	var scoreText:TextField = null;
+	var sTime:Float;
 	
 	// Simple constructor
     public function new() {
@@ -102,6 +103,7 @@ class Sandbox extends starling.display.Sprite {
 		running = true;
 		revivePoints = -1;
 		haxe.Log.clear();
+		sTime = flash.Lib.getTimer()/1000;
 		
 		// Start the onEnterFrame calls
 		this.addEventListener(EnterFrameEvent.ENTER_FRAME, onEnterFrame);	
@@ -272,7 +274,8 @@ class Sandbox extends starling.display.Sprite {
 		overlay.alpha = 0.7;
 		addChild(overlay);
 		
-		var menuText = new TextField(globalStage.stageWidth, globalStage.stageHeight, "You lose!\n\nFinal Score: " + points + "\nTime: " + flash.Lib.getTimer()/1000 + " seconds\n\nPress <SPACE> to restart");
+		var endTime = Math.round((flash.Lib.getTimer()/1000 - sTime)*1000)/1000;
+		var menuText = new TextField(globalStage.stageWidth, globalStage.stageHeight, "You lose!\n\nFinal Score: " + points + "\nTime: " + endTime + " seconds\n\nPress <SPACE> to restart");
 		menuText.fontSize = 18;
 		menuText.color = 0xFFFFFF;
 		addChild(menuText);
